@@ -50,6 +50,18 @@ def attendance(address: str):
         attendance()
 
 
+def edit_readme(count: str, total: str, point: str):
+    file_path = "README.md"
+
+    with open(file_path, "r", encoding="UTF8") as f:
+        text = f.readlines()
+        text[text.index("누적 참여 횟수 | 누적 획득 포인트 | 금일 획득 포인트\n") + 2] = f"{count} | {total} | {point}\n"
+
+    with open(file_path, "w", encoding="UTF8") as f:
+        for e in text:
+            f.write(e)
+
+
 if __name__ == "__main__":
     address = get_address()
     login(address)
