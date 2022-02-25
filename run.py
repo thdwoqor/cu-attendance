@@ -1,5 +1,7 @@
+import json
 import sys
 import time
+from datetime import datetime
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -60,6 +62,18 @@ def edit_readme(count: str, total: str, point: str):
     with open(file_path, "w", encoding="UTF8") as f:
         for e in text:
             f.write(e)
+
+
+def edit_record(point: str):
+    today = dict()
+    today["point"] = point
+    today["when"] = str(datetime.today())
+
+    with open("record.json", "r", encoding="UTF8") as f:
+        data = json.load(f)
+    with open("record.json", "w", encoding="UTF8") as f:
+        data.append(today)
+        json.dump(data, f, indent="\t")
 
 
 if __name__ == "__main__":
