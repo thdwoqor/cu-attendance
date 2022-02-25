@@ -1,4 +1,5 @@
 import sys
+import time
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -35,7 +36,22 @@ def get_address() -> str:
                 return f"https://apmember.bgfretail.com/pc/login?service=https%3A%2F%2Fapmembership.bgfretail.com%2Fpc%2FeventDetail%3Fevent_id%3D{event_id}"
 
 
+def attendance(address: str):
+    count, total, point = 0, 0, 0
+    try:
+        WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="play"]')))
+        driver.find_element(By.XPATH, '//*[@id="play"]').click()
+        time.sleep(10)
+        count = driver.find_element(By.XPATH, '//*[@id="myAttendCnt"]').text
+        total = driver.find_element(By.XPATH, '//*[@id="myAttendPoint"]').text
+        point = driver.find_element(By.XPATH, '//*[@id="rouletteResultText"]').text
+    except:
+        driver.get(address)
+        attendance()
+
+
 if __name__ == "__main__":
     address = get_address()
     login(address)
+    attendance(address)
     driver.quit()
