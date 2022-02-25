@@ -1,8 +1,27 @@
+import sys
+
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
 from util.driver import driver
+
+
+def login(address: str):
+    try:
+        driver.get(address)
+
+        WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, "/html/body/div[3]/div[1]/div[1]/div/div[3]/div[3]/button")))
+
+        id = driver.find_element(By.XPATH, "/html/body/div[3]/div[1]/div[1]/div/div[3]/div[1]/input")
+        id.send_keys(str(sys.argv[1]))
+
+        pw = driver.find_element(By.XPATH, "/html/body/div[3]/div[1]/div[1]/div/div[3]/div[2]/input")
+        pw.send_keys(str(sys.argv[2]))
+
+        driver.find_element(By.XPATH, "/html/body/div[3]/div[1]/div[1]/div/div[3]/div[3]/button").click()
+    except:
+        login(address)
 
 
 def get_address() -> str:
@@ -18,4 +37,5 @@ def get_address() -> str:
 
 if __name__ == "__main__":
     address = get_address()
+    login(address)
     driver.quit()
