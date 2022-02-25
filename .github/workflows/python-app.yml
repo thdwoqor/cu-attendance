@@ -1,4 +1,4 @@
-name: attendance
+name: Attendance Bot (출석 봇)
 
 on:
   workflow_dispatch:
@@ -10,7 +10,7 @@ on:
   repository_dispatch:
     types: [build-event]
   schedule:
-    - cron: '0 21 * * *'
+    - cron: '0 3,9,15,21 * * *'
     
 jobs:
   build:

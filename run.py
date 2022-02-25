@@ -50,8 +50,9 @@ def attendance(address: str):
     except:
         driver.get(address)
         attendance()
-    edit_readme(count, total, point)
-    edit_record(point)
+    if point > 0:
+        edit_readme(count, total, point)
+        edit_record(point)
 
 
 def edit_readme(count: str, total: str, point: str):
