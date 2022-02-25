@@ -1,0 +1,47 @@
+name: attendance
+
+on:
+  workflow_dispatch:
+    inputs:
+      name:
+        description: "Person to greet"
+        required: true
+        default: "thdwoqor"
+  repository_dispatch:
+    types: [build-event]
+  schedule:
+    - cron: '0 21 * * *'
+    
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 pytest
+        pip install -r requirements.txt
+        
+    - name: Run run.py
+      run: |
+        python run.py ${{ secrets.ID }} ${{ secrets.PW }}
+
+    - name: Commit
+      run: |
+        git config --local user.email "attendancebot@gmail.com"
+        git config --local user.name "bot"
+        git add .
+        if [ -z "$(git status --porcelain)" ]; then echo "Nothing changed"; else git commit -m "bot: update files"; fi
+
+    - name: Push
+      uses: ad-m/github-push-action@master
+      with:
+        branch: 'master'
+        github_token: $
