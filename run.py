@@ -32,24 +32,27 @@ def get_address() -> str:
         for i, item in enumerate(items):
             if list(filter(lambda x: x in item.text, ["출석 룰렛", "출석룰렛"])):
                 event_id = driver.find_element(By.XPATH, f'//*[@id="contents"]/div[3]/div[3]/ul/li[{i+1}]/div/img').get_attribute("data-event_id")
-                return f"https://apmember.bgfretail.com/pc/login?service=https%3A%2F%2Fapmembership.bgfretail.com%2Fpc%2FeventDetail%3Fevent_id%3D{event_id}"
+
+                address = f"https://apmember.bgfretail.com/pc/login?service=https%3A%2F%2Fapmembership.bgfretail.com%2Fpc%2FeventDetail%3Fevent_id%3D{event_id}"
+                print(address)
+                return address
+    get_address()
 
 
-def attendance(address: str):
-    count, total, point = 0, 0, 0
+def attendance():
+    time.sleep(10)
+    count, total, point = 0, 0, ""
     WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="play"]')))
     driver.find_element(By.XPATH, '//*[@id="play"]').click()
     time.sleep(10)
     count = driver.find_element(By.XPATH, '//*[@id="myAttendCnt"]').text
     total = driver.find_element(By.XPATH, '//*[@id="myAttendPoint"]').text
     point = driver.find_element(By.XPATH, '//*[@id="rouletteResultText"]').text
+    print(count, total, point)
 
-    try:
-        if int(point) > 0:
-            edit_readme(count, total, point)
-            edit_record(point)
-    except Exception as e1:
-        print(e1)
+    if len(point) > 0:
+        edit_readme(count, total, point)
+        edit_record(point)
 
 
 def edit_readme(count: str, total: str, point: str):
@@ -77,7 +80,8 @@ def edit_record(point: str):
 
 
 if __name__ == "__main__":
+    driver.implicitly_wait(10)
     address = get_address()
     login(address)
-    attendance(address)
+    attendance()
     driver.quit()
