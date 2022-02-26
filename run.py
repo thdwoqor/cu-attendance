@@ -11,20 +11,17 @@ from util.driver import driver
 
 
 def login(address: str):
-    try:
-        driver.get(address)
+    driver.get(address)
 
-        WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, "/html/body/div[3]/div[1]/div[1]/div/div[3]/div[3]/button")))
+    WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, "/html/body/div[3]/div[1]/div[1]/div/div[3]/div[3]/button")))
 
-        id = driver.find_element(By.XPATH, "/html/body/div[3]/div[1]/div[1]/div/div[3]/div[1]/input")
-        id.send_keys(str(sys.argv[1]))
+    id = driver.find_element(By.XPATH, "/html/body/div[3]/div[1]/div[1]/div/div[3]/div[1]/input")
+    id.send_keys(str(sys.argv[1]))
 
-        pw = driver.find_element(By.XPATH, "/html/body/div[3]/div[1]/div[1]/div/div[3]/div[2]/input")
-        pw.send_keys(str(sys.argv[2]))
+    pw = driver.find_element(By.XPATH, "/html/body/div[3]/div[1]/div[1]/div/div[3]/div[2]/input")
+    pw.send_keys(str(sys.argv[2]))
 
-        driver.find_element(By.XPATH, "/html/body/div[3]/div[1]/div[1]/div/div[3]/div[3]/button").click()
-    except:
-        login(address)
+    driver.find_element(By.XPATH, "/html/body/div[3]/div[1]/div[1]/div/div[3]/div[3]/button").click()
 
 
 def get_address() -> str:
@@ -40,16 +37,13 @@ def get_address() -> str:
 
 def attendance(address: str):
     count, total, point = 0, 0, 0
-    try:
-        WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="play"]')))
-        driver.find_element(By.XPATH, '//*[@id="play"]').click()
-        time.sleep(10)
-        count = driver.find_element(By.XPATH, '//*[@id="myAttendCnt"]').text
-        total = driver.find_element(By.XPATH, '//*[@id="myAttendPoint"]').text
-        point = driver.find_element(By.XPATH, '//*[@id="rouletteResultText"]').text
-    except:
-        driver.get(address)
-        attendance()
+    WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="play"]')))
+    driver.find_element(By.XPATH, '//*[@id="play"]').click()
+    time.sleep(10)
+    count = driver.find_element(By.XPATH, '//*[@id="myAttendCnt"]').text
+    total = driver.find_element(By.XPATH, '//*[@id="myAttendPoint"]').text
+    point = driver.find_element(By.XPATH, '//*[@id="rouletteResultText"]').text
+
     try:
         if int(point) > 0:
             edit_readme(count, total, point)

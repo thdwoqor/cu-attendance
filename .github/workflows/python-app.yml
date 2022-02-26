@@ -28,7 +28,16 @@ jobs:
         python -m pip install --upgrade pip
         pip install flake8 pytest
         pip install -r requirements.txt
-        
+    
+    - name: Install ubuntu package
+      run: |        
+        sudo apt-get install fonts-unfonts-core
+        sudo apt-get install fonts-unfonts-extra
+        wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add        
+        sudo apt-get install google-chrome-stable    
+        wget https://chromedriver.storage.googleapis.com/2.40/chromedriver_linux64.zip
+        unzip ./chromedriver_linux64.zip   
+
     - name: Run run.py
       run: |
         python run.py ${{ secrets.ID }} ${{ secrets.PW }}
