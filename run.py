@@ -45,22 +45,23 @@ def attendance():
     WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="play"]')))
     driver.find_element(By.XPATH, '//*[@id="play"]').click()
     time.sleep(10)
-    count = driver.find_element(By.XPATH, '//*[@id="myAttendCnt"]').text
-    total = driver.find_element(By.XPATH, '//*[@id="myAttendPoint"]').text
+    # count = driver.find_element(By.XPATH, '//*[@id="myAttendCnt"]').text
+    # total = driver.find_element(By.XPATH, '//*[@id="myAttendPoint"]').text
     point = driver.find_element(By.XPATH, '//*[@id="rouletteResultText"]').text
-    print(count, total, point)
+    # print(count, total, point)
+    print(point)
 
     if len(point) > 0:
         edit_readme(str(int(count) + 1), str(int(total) + int(point[:-1])), point)
         edit_record(point)
 
 
-def edit_readme(count: str, total: str, point: str):
+def edit_readme(point: str):
     file_path = "README.md"
 
     with open(file_path, "r", encoding="UTF8") as f:
         text = f.readlines()
-        text[text.index("누적 참여 횟수 | 누적 획득 포인트 | 금일 획득 포인트\n") + 2] = f"{count} | {total} | {point}\n"
+        text[text.index("|금일 획득 포인트\n") + 2] = f"|{point}\n"
 
     with open(file_path, "w", encoding="UTF8") as f:
         for e in text:

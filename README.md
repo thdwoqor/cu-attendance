@@ -4,9 +4,9 @@
 <a href="https://www.selenium.dev/"><img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=Python&logoColor=white"/></a>  
 >포켓 CU 출석체크 봇  
 
-누적 참여 횟수 | 누적 획득 포인트 | 금일 획득 포인트
--- | --  | -- 
-5 | 35 | 7P
+|금일 획득 포인트
+|-- 
+|7P
 
 ## Getting Started  
 
