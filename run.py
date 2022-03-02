@@ -52,7 +52,7 @@ def attendance():
     print(point)
 
     if len(point) > 0:
-        edit_readme(str(int(count) + 1), str(int(total) + int(point[:-1])), point)
+        edit_readme(point)
         edit_record(point)
 
 
