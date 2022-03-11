@@ -9,7 +9,6 @@
 |짜잔~!
 CU포인트 7포인트 당첨!
 다음주 수요일에 일괄지급 됩니다!
-
 pip install -r requirements.txt
 
 echo "id=[<b>yourID</b>]" >> .env
