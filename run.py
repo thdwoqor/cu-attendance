@@ -62,7 +62,7 @@ def edit_readme(point: str):
     with open(file_path, "r", encoding="UTF8") as f:
         text = f.readlines()
         index = text.index("|금일 획득 포인트\n") + 2
-        text[index : index + 3] = ""
+        text[index : index + 2] = ""
         text[index] = f"|{point}\n"
 
     with open(file_path, "w", encoding="UTF8") as f:
