@@ -1,76 +1,79 @@
 import json
-import sys
-import time
+import os
 from datetime import datetime
 
+from dotenv import load_dotenv
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
 
 from util.driver import driver
 
+load_dotenv(verbose=True)
+
 
 def login(address: str):
-    driver.get(address)
+    driver.get(f"https://www.pocketcu.co.kr/login?referer_url={address}")
 
-    WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, "/html/body/div[3]/div[1]/div[1]/div/div[3]/div[3]/button")))
+    driver.implicitly_wait(10)
 
-    id = driver.find_element(By.XPATH, "/html/body/div[3]/div[1]/div[1]/div/div[3]/div[1]/input")
-    id.send_keys(str(sys.argv[1]))
+    id = driver.find_element(By.XPATH, '//*[@id="loginId"]')
+    id.send_keys(os.getenv("ID"))
 
-    pw = driver.find_element(By.XPATH, "/html/body/div[3]/div[1]/div[1]/div/div[3]/div[2]/input")
-    pw.send_keys(str(sys.argv[2]))
+    pw = driver.find_element(By.XPATH, '//*[@id="loginPwd"]')
+    pw.send_keys(os.getenv("PW"))
 
-    driver.find_element(By.XPATH, "/html/body/div[3]/div[1]/div[1]/div/div[3]/div[3]/button").click()
+    driver.find_element(By.XPATH, '//*[@id="loginForm"]/div/div[4]/a').click()
 
 
 def get_address() -> str:
-    for i in range(1, 10):
-        driver.get(f"https://apmembership.bgfretail.com/pc/eventList?sType=&state=&page={i}")
-        WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.XPATH, '//*[@id="contents"]/div[3]/div[3]')))
-        items = driver.find_elements(By.XPATH, '//*[@id="contents"]/div[3]/div[3]/ul/li/h4')
-        for i, item in enumerate(items):
-            if list(filter(lambda x: x in item.text, ["출석 룰렛", "출석룰렛"])):
-                event_id = driver.find_element(By.XPATH, f'//*[@id="contents"]/div[3]/div[3]/ul/li[{i+1}]/div/img').get_attribute("data-event_id")
+    driver.get(f"https://www.pocketcu.co.kr/event/main")
 
-                address = f"https://apmember.bgfretail.com/pc/login?service=https%3A%2F%2Fapmembership.bgfretail.com%2Fpc%2FeventDetail%3Fevent_id%3D{event_id}"
-                print(address)
-                return address
-    get_address()
+    driver.implicitly_wait(10)
+
+    items = driver.find_elements(By.XPATH, '//*[@id="contents"]/section/div[2]/ul/li/section/div/div[2]/div/p[2]')
+    for i, item in enumerate(items):
+        if list(filter(lambda x: x in item.text, ["출석체크", "출석 체크"])):
+            event_id = driver.find_element(By.XPATH, f"/html/body/div/div/div/section/div[2]/ul/li[{i+1}]/section/div/div[1]").get_attribute("id")
+            event_id = event_id[3:]
+            address = f"https://www.pocketcu.co.kr/event/eventView/{event_id}"
+            return address
 
 
 def attendance():
-    time.sleep(10)
-    count, total, point = 0, 0, ""
-    WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="play"]')))
-    driver.find_element(By.XPATH, '//*[@id="play"]').click()
-    time.sleep(10)
-    # count = driver.find_element(By.XPATH, '//*[@id="myAttendCnt"]').text
-    # total = driver.find_element(By.XPATH, '//*[@id="myAttendPoint"]').text
-    point = driver.find_element(By.XPATH, '//*[@id="rouletteResultText"]').text
-    # print(count, total, point)
-    print(point)
+    driver.implicitly_wait(10)
 
-    if len(point) > 0:
-        edit_readme(point)
+    now_count = driver.find_element(By.XPATH, '//*[@id="myAttendCnt"]').text
+    now_total = driver.find_element(By.XPATH, '//*[@id="myAttendPoint"]').text
+
+    driver.find_element(By.XPATH, '//*[@id="contents"]/section/section/section[1]/div[2]/div/div[2]/div/div').click()
+
+    driver.refresh()
+
+    driver.implicitly_wait(10)
+
+    count = driver.find_element(By.XPATH, '//*[@id="myAttendCnt"]').text
+    total = driver.find_element(By.XPATH, '//*[@id="myAttendPoint"]').text
+    point = int(total) - int(now_total)
+    print(count, total)
+
+    if now_count != count:
+        edit_readme(count, total, point)
         edit_record(point)
 
 
-def edit_readme(point: str):
+def edit_readme(count: str, total: str, point: int):
     file_path = "README.md"
 
     with open(file_path, "r", encoding="UTF8") as f:
         text = f.readlines()
-        index = text.index("|금일 획득 포인트\n") + 2
-        text[index : index + 2] = ""
-        text[index] = f"|{point}\n"
+        index = text.index(">포켓 CU 출석체크 봇\n") + 4
+        text[index] = f" {count} | {total} | {point}\n"
 
     with open(file_path, "w", encoding="UTF8") as f:
         for e in text:
             f.write(e)
 
 
-def edit_record(point: str):
+def edit_record(point: int):
     today = dict()
     today["point"] = point
     today["when"] = str(datetime.today())
@@ -83,7 +86,6 @@ def edit_record(point: str):
 
 
 if __name__ == "__main__":
-    driver.implicitly_wait(10)
     address = get_address()
     login(address)
     attendance()
