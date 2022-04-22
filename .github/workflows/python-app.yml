@@ -38,9 +38,15 @@ jobs:
         wget https://chromedriver.storage.googleapis.com/2.40/chromedriver_linux64.zip
         unzip ./chromedriver_linux64.zip   
 
+    - name: Create .env file
+      run: |
+        jq -r 'to_entries|map("\(.key)=\(.value|tostring)")|.[]' <<< "$SECRETS_CONTEXT" > .env
+      env:
+        SECRETS_CONTEXT: ${{ toJson(secrets) }}
+
     - name: Run run.py
       run: |
-        python run.py ${{ secrets.ID }} ${{ secrets.PW }}
+        python run.py
 
     - name: Commit
       run: |
