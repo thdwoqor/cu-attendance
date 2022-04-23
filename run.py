@@ -1,5 +1,6 @@
 import json
 import os
+import time
 from datetime import datetime
 
 from dotenv import load_dotenv
@@ -43,17 +44,18 @@ def attendance():
 
     now_count = driver.find_element(By.XPATH, '//*[@id="myAttendCnt"]').text
     now_total = driver.find_element(By.XPATH, '//*[@id="myAttendPoint"]').text
+    print(now_count, now_total)
 
     driver.find_element(By.XPATH, '//*[@id="contents"]/section/section/section[1]/div[2]/div/div[2]/div/div').click()
 
     driver.refresh()
 
-    driver.implicitly_wait(10)
+    time.sleep(10)
 
     count = driver.find_element(By.XPATH, '//*[@id="myAttendCnt"]').text
     total = driver.find_element(By.XPATH, '//*[@id="myAttendPoint"]').text
     point = int(total) - int(now_total)
-    print(count, total)
+    print(count, total, point)
 
     if now_count != count:
         edit_readme(count, total, point)
