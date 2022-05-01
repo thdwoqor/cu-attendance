@@ -4,56 +4,76 @@ import time
 from datetime import datetime
 
 from dotenv import load_dotenv
+from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 
 from util.driver import driver
 
 load_dotenv(verbose=True)
 
 
-def login(address: str):
-    driver.get(f"https://www.pocketcu.co.kr/login?referer_url={address}")
+def login():
+    address = get_address()
 
-    driver.implicitly_wait(10)
+    driver.get(f"https://www.pocketcu.co.kr/login?referer_url=https%3A%2F%2Fwww.pocketcu.co.kr%2Fevent%2FeventView%2F{address}")
 
-    id = driver.find_element(By.XPATH, '//*[@id="loginId"]')
+    time.sleep(10)
+
+    print(driver.current_url)
+
+    id = driver.find_element(By.CSS_SELECTOR, "#loginId")
     id.send_keys(os.getenv("ID"))
 
-    pw = driver.find_element(By.XPATH, '//*[@id="loginPwd"]')
+    pw = driver.find_element(By.CSS_SELECTOR, "#loginPwd")
     pw.send_keys(os.getenv("PW"))
 
-    driver.find_element(By.XPATH, '//*[@id="loginForm"]/div/div[4]/a').click()
+    element = driver.find_element(By.CSS_SELECTOR, "#loginForm > div > div.btn_wrap > a")
+    driver.execute_script("arguments[0].click();", element)
+
+    time.sleep(10)
+
+    print(driver.current_url)
 
 
 def get_address() -> str:
     driver.get(f"https://www.pocketcu.co.kr/event/main")
 
-    driver.implicitly_wait(10)
+    time.sleep(20)
 
-    items = driver.find_elements(By.XPATH, '//*[@id="contents"]/section/div[2]/ul/li/section/div/div[2]/div/p[2]')
+    items = driver.find_elements(By.CSS_SELECTOR, "#contents > section > div.event_list > ul > li > section > div > div.txt_info > div > p.tit_16")
     for i, item in enumerate(items):
-        if list(filter(lambda x: x in item.text, ["출석체크", "출석 체크"])):
-            event_id = driver.find_element(By.XPATH, f"/html/body/div/div/div/section/div[2]/ul/li[{i+1}]/section/div/div[1]").get_attribute("id")
+        if list(filter(lambda x: x in item.text, ["출석체크", "출석 체크", "출석룰렛"])):
+            event_id = driver.find_element(
+                By.CSS_SELECTOR, f"#contents > section > div.event_list > ul > li:nth-child({i+1}) > section > div > div.img_wrap"
+            ).get_attribute("id")
             event_id = event_id[3:]
-            address = f"https://www.pocketcu.co.kr/event/eventView/{event_id}"
-            return address
+            print(event_id)
+            return event_id
 
 
 def attendance():
-    driver.implicitly_wait(10)
+    time.sleep(10)
 
-    now_count = driver.find_element(By.XPATH, '//*[@id="myAttendCnt"]').text
-    now_total = driver.find_element(By.XPATH, '//*[@id="myAttendPoint"]').text
+    now_count = driver.find_element(By.CSS_SELECTOR, "#myAttendCnt").text
+    now_total = driver.find_element(By.CSS_SELECTOR, "#myAttendPoint").text
     print(now_count, now_total)
 
-    driver.find_element(By.XPATH, '//*[@id="contents"]/section/section/section[1]/div[2]/div/div[2]/div/div').click()
+    element = driver.find_element(
+        By.CSS_SELECTOR, "#contents > section > section > section.sub_wrap > div.event_area > div > div > div > div.roulette_main > div > div"
+    )
+    driver.execute_script("arguments[0].click();", element)
+
+    time.sleep(10)
 
     driver.refresh()
 
     time.sleep(10)
 
-    count = driver.find_element(By.XPATH, '//*[@id="myAttendCnt"]').text
-    total = driver.find_element(By.XPATH, '//*[@id="myAttendPoint"]').text
+    count = driver.find_element(By.CSS_SELECTOR, "#myAttendCnt").text
+    total = driver.find_element(By.CSS_SELECTOR, "#myAttendPoint").text
     point = int(total) - int(now_total)
     print(count, total, point)
 
@@ -88,7 +108,6 @@ def edit_record(point: int):
 
 
 if __name__ == "__main__":
-    address = get_address()
-    login(address)
+    login()
     attendance()
     driver.quit()
