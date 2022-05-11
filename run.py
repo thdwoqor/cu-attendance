@@ -2,13 +2,11 @@ import json
 import os
 import time
 from datetime import datetime
+from urllib.request import Request, urlopen
 
+import requests
 from dotenv import load_dotenv
-from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
 
 from util.driver import driver
 
@@ -20,7 +18,7 @@ def login():
 
     driver.get(f"https://www.pocketcu.co.kr/login?referer_url=https%3A%2F%2Fwww.pocketcu.co.kr%2Fevent%2FeventView%2F{address}")
 
-    time.sleep(30)
+    time.sleep(10)
 
     print(driver.current_url)
 
@@ -33,29 +31,34 @@ def login():
     element = driver.find_element(By.CSS_SELECTOR, "#loginForm > div > div.btn_wrap > a")
     driver.execute_script("arguments[0].click();", element)
 
-    time.sleep(30)
+    time.sleep(10)
 
     print(driver.current_url)
 
 
 def get_address() -> str:
-    driver.get(f"https://www.pocketcu.co.kr/event/main")
+    try:
+        page = requests.post(f"https://pocketcu.co.kr/api/v1/event?page=1&pagePerSize=999&evtStatus=ing&cateId=all", timeout=10)
 
-    time.sleep(30)
+        if page.status_code != 200:
+            raise
+        doc = page.text
 
-    items = driver.find_elements(By.XPATH, "//p[@class='tit_16']")
-    for i, item in enumerate(items):
-        if list(filter(lambda x: x in item.text, ["출석체크", "출석 체크", "출석룰렛"])):
-            event_id = driver.find_element(
-                By.CSS_SELECTOR, f"#contents > section > div.event_list > ul > li:nth-child({i+1}) > section > div > div.img_wrap"
-            ).get_attribute("id")
-            event_id = event_id[3:]
-            print(event_id)
-            return event_id
+    except:
+        req = Request(f"https://pocketcu.co.kr/api/v1/event?page=1&pagePerSize=999&evtStatus=ing&cateId=all")
+        page = urlopen(req, timeout=10)
+        doc = page.read().decode("utf-8")
+    finally:
+        dict = json.loads(doc)
+        keywords = ["출석", "룰렛"]
+
+        for i in dict["eventList"]:
+            if any(keyword in i["prdDispNm"] for keyword in keywords):
+                return i["evtCd"]
 
 
 def attendance():
-    time.sleep(30)
+    time.sleep(10)
 
     now_count = driver.find_element(By.CSS_SELECTOR, "#myAttendCnt").text
     now_total = driver.find_element(By.CSS_SELECTOR, "#myAttendPoint").text
@@ -66,11 +69,11 @@ def attendance():
     )
     driver.execute_script("arguments[0].click();", element)
 
-    time.sleep(30)
+    time.sleep(10)
 
     driver.refresh()
 
-    time.sleep(30)
+    time.sleep(10)
 
     count = driver.find_element(By.CSS_SELECTOR, "#myAttendCnt").text
     total = driver.find_element(By.CSS_SELECTOR, "#myAttendPoint").text
