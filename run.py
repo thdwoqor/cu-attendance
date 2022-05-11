@@ -20,7 +20,7 @@ def login():
 
     driver.get(f"https://www.pocketcu.co.kr/login?referer_url=https%3A%2F%2Fwww.pocketcu.co.kr%2Fevent%2FeventView%2F{address}")
 
-    time.sleep(10)
+    time.sleep(30)
 
     print(driver.current_url)
 
@@ -33,7 +33,7 @@ def login():
     element = driver.find_element(By.CSS_SELECTOR, "#loginForm > div > div.btn_wrap > a")
     driver.execute_script("arguments[0].click();", element)
 
-    time.sleep(10)
+    time.sleep(30)
 
     print(driver.current_url)
 
@@ -41,9 +41,9 @@ def login():
 def get_address() -> str:
     driver.get(f"https://www.pocketcu.co.kr/event/main")
 
-    time.sleep(20)
+    time.sleep(30)
 
-    items = driver.find_elements(By.CSS_SELECTOR, "#contents > section > div.event_list > ul > li > section > div > div.txt_info > div > p.tit_16")
+    items = driver.find_elements(By.XPATH, "//p[@class='tit_16']")
     for i, item in enumerate(items):
         if list(filter(lambda x: x in item.text, ["출석체크", "출석 체크", "출석룰렛"])):
             event_id = driver.find_element(
@@ -55,7 +55,7 @@ def get_address() -> str:
 
 
 def attendance():
-    time.sleep(10)
+    time.sleep(30)
 
     now_count = driver.find_element(By.CSS_SELECTOR, "#myAttendCnt").text
     now_total = driver.find_element(By.CSS_SELECTOR, "#myAttendPoint").text
@@ -66,11 +66,11 @@ def attendance():
     )
     driver.execute_script("arguments[0].click();", element)
 
-    time.sleep(10)
+    time.sleep(30)
 
     driver.refresh()
 
-    time.sleep(10)
+    time.sleep(30)
 
     count = driver.find_element(By.CSS_SELECTOR, "#myAttendCnt").text
     total = driver.find_element(By.CSS_SELECTOR, "#myAttendPoint").text
