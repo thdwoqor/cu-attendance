@@ -60,9 +60,9 @@ def get_address() -> str:
 def attendance():
     time.sleep(10)
 
-    now_count = driver.find_element(By.CSS_SELECTOR, "#myAttendCnt").text
-    now_total = driver.find_element(By.CSS_SELECTOR, "#myAttendPoint").text
-    print(now_count, now_total)
+#     now_count = driver.find_element(By.CSS_SELECTOR, "#myAttendCnt").text
+#     now_total = driver.find_element(By.CSS_SELECTOR, "#myAttendPoint").text
+#     print(now_count, now_total)
 
     element = driver.find_element(
         By.CSS_SELECTOR, "#contents > section > section > section.sub_wrap > div.event_area > div > div > div > div.roulette_main > div > div"
@@ -75,14 +75,14 @@ def attendance():
 
     time.sleep(10)
 
-    count = driver.find_element(By.CSS_SELECTOR, "#myAttendCnt").text
-    total = driver.find_element(By.CSS_SELECTOR, "#myAttendPoint").text
-    point = int(total) - int(now_total)
-    print(count, total, point)
+#     count = driver.find_element(By.CSS_SELECTOR, "#myAttendCnt").text
+#     total = driver.find_element(By.CSS_SELECTOR, "#myAttendPoint").text
+#     point = int(total) - int(now_total)
+#     print(count, total, point)
 
-    if now_count != count:
-        edit_readme(count, total, point)
-        edit_record(point)
+#     if now_count != count:
+#         edit_readme(count, total, point)
+#         edit_record(point)
 
 
 def edit_readme(count: str, total: str, point: int):
